@@ -16,4 +16,8 @@ class BasketPriceCalculator:
         self._offers = offers
 
     def calculate_price(self, basket: Basket) -> PriceResult:
-        return PriceResult()
+        return PriceResult(
+            sub_total=sum(p.price for p in basket.get_products()),
+            discount=0,
+            total=sum(p.price for p in basket.get_products())
+        )

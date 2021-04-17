@@ -9,9 +9,12 @@ class Product:
     price: float
 
 
-@dataclass
-class Basket:
-    products: List[Product] = field(default_factory=list)
+class Basket(ABC):
+    def __init__(self, products: List[Product] = None):
+        self._products = products or []
+
+    def get_products(self) -> List[Product]:
+        raise NotImplementedError()
 
 
 class Catalog(ABC):
