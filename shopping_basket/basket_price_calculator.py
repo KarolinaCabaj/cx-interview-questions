@@ -1,8 +1,7 @@
-import itertools
 from dataclasses import dataclass
 from typing import Dict, List, Tuple
 
-from models import Basket, BasketItem, Offer, OfferFreeProducts, OfferPercentageDiscount
+from models import Basket, Offer, OfferFreeProducts, OfferPercentageDiscount
 from offer_applicability_resolver import OfferApplicabilityResolver
 
 
@@ -41,7 +40,7 @@ class BasketPriceCalculator:
         return item_price_result
 
     def _get_max_discount_for_item(self, offers_for_item: List[Offer], item) -> float:
-        offer_combinations = self._get_all_offer_combinations_for_item(item, offers_for_item)
+        offer_combinations = self._offer_resolver.get_item_offer_combinations(item, offers_for_item)
         discounts_for_combinations = self._calculate_discounts_for_offers_combination(offer_combinations)
         max_discount_for_item = max(discounts_for_combinations) if discounts_for_combinations else 0
         return max_discount_for_item
@@ -55,16 +54,6 @@ class BasketPriceCalculator:
             discount=discount,
             total=sub_total - discount
         )
-
-    @staticmethod
-    def _get_all_offer_combinations_for_item(item: BasketItem, offers_for_item: List[Offer]) -> List[Tuple[Offer]]:
-        # get possible combinations of offers, there can be from 1 to number of product offers applied at a time
-        # each combination gather offers that cover all instances of given product or less
-        return [
-            offer_combination for number_of_offers_to_apply in range(1, item.quantity + 1)
-            for offer_combination in itertools.combinations_with_replacement(offers_for_item, number_of_offers_to_apply)
-            if sum(offer.number_of_products_required_to_bought for offer in offer_combination) <= item.quantity
-        ]
 
     def _calculate_discounts_for_offers_combination(self, offer_combinations: List[Tuple[Offer]]) -> List[float]:
         return [self._calculate_discount_for_offer_combination(combination) for combination in offer_combinations]

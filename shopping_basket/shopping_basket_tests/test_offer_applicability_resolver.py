@@ -154,3 +154,90 @@ def test_get_offers_applicable_for_many_products(offer_applicability_resolver, o
     applicable_offers = offer_applicability_resolver.get_offers_applicable_for_basket_items(basket_items)
 
     assert applicable_offers == expected_offers
+
+
+@pytest.mark.parametrize('offers, expected_combinations', [
+    # one combination possible
+    (
+            [
+                OfferFreeProducts(
+                    product_name='shampoo',
+                    number_of_products_required_to_bought=5,
+                    number_of_free_products=2
+                )
+            ],
+            [
+                (OfferFreeProducts(
+                    product_name='shampoo',
+                    number_of_products_required_to_bought=5,
+                    number_of_free_products=2
+                ),
+                )
+            ]
+    ),
+    # multiple combinations possible
+    (
+            # offers
+            [
+                OfferFreeProducts(
+                    product_name='shampoo',
+                    number_of_products_required_to_bought=3,
+                    number_of_free_products=1
+                ),
+                OfferPercentageDiscount(
+                    product_name='shampoo',
+                    number_of_products_required_to_bought=2,
+                    discount=10
+                )
+            ],
+            # combinations
+            [
+                (
+                        OfferFreeProducts(
+                            product_name='shampoo',
+                            number_of_products_required_to_bought=3,
+                            number_of_free_products=1
+                        ),
+                        OfferFreeProducts(
+                            product_name='shampoo',
+                            number_of_products_required_to_bought=3,
+                            number_of_free_products=1
+                        )
+                ),
+                (
+                        OfferFreeProducts(
+                            product_name='shampoo',
+                            number_of_products_required_to_bought=3,
+                            number_of_free_products=1
+                        ),
+                        OfferPercentageDiscount(
+                            product_name='shampoo',
+                            number_of_products_required_to_bought=2,
+                            discount=10
+                        )
+                ),
+                (
+                        OfferPercentageDiscount(
+                            product_name='shampoo',
+                            number_of_products_required_to_bought=2,
+                            discount=10
+                        ),
+                        OfferPercentageDiscount(
+                            product_name='shampoo',
+                            number_of_products_required_to_bought=2,
+                            discount=10
+                        ),
+                        OfferPercentageDiscount(
+                            product_name='shampoo',
+                            number_of_products_required_to_bought=2,
+                            discount=10
+                        )
+                )
+            ]
+    )
+])
+def test_get_item_offer_combinations(offer_applicability_resolver, offers, expected_combinations):
+    basket_item = BasketItem(product_name='shampoo', quantity=6)
+    combinations = offer_applicability_resolver.get_item_offer_combinations(basket_item, offers)
+
+    assert combinations == expected_combinations

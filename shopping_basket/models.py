@@ -33,7 +33,6 @@ class OfferPercentageDiscount(Offer):
     discount: float
 
 
-# class should belong to this component, just require list of offers
 class OffersProvider:
     def __init__(self, offers: List[Offer]):
         self._offers = self._init_offer_storage(offers)
