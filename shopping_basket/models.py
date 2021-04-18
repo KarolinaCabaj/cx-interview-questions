@@ -1,6 +1,6 @@
 from abc import ABC
-from dataclasses import dataclass, field
-from typing import List
+from dataclasses import dataclass
+from typing import Dict, List
 
 
 @dataclass
@@ -9,42 +9,50 @@ class Product:
     price: float
 
 
+@dataclass
+class BasketItem:
+    product: Product
+    quantity: int
+
+
 class Basket(ABC):
-    def __init__(self, products: List[Product] = None):
-        self._products = products or []
+    def __init__(self, items: List[BasketItem] = None):
+        self.items = items or []
 
-    def get_products(self) -> List[Product]:
-        raise NotImplementedError()
-
-
-class Catalog(ABC):
-    def __init__(self, products: List[Product]):
-        self._products = products
-
-    def get_products(self) -> List[Product]:
+    def get_items(self) -> List[BasketItem]:
         raise NotImplementedError()
 
 
 @dataclass
 class Offer(ABC):
-    product: Product
+    product_name: str
+    number_of_products_required_to_bought: int
 
 
 @dataclass
 class OfferFreeProducts(Offer):
-    number_of_products: int
     number_of_free_products: int
 
 
 @dataclass
 class OfferPercentageDiscount(Offer):
-    number_of_products: int
     discount: float
 
 
-class Offers(ABC):
+# class should belong to this component, just require list of offers
+class OffersProvider:
     def __init__(self, offers: List[Offer]):
-        self._offers = offers
+        self._offers = self._init_offer_storage(offers)
 
-    def get_offers(self) -> List[Offer]:
-        raise NotImplementedError()
+    @staticmethod
+    def _init_offer_storage(offers: List[Offer]):
+        mapped_offers = dict()
+        for offer in offers:
+            mapped_offers.setdefault(offer.product_name, []).append(offer)
+        return mapped_offers
+
+    def get_offers(self) -> Dict[str, List[Offer]]:
+        return self._offers
+
+    def get_offer_for_product(self, product_name: str) -> List[Offer]:
+        return self._offers[product_name]
