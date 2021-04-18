@@ -22,10 +22,11 @@ class BasketPriceCalculator:
         items_price_results = []
         for item in basket.get_items():
 
-            sub_total = item.product.price * item.quantity
+            # assume that if product is in basket it must be in catalog
+            sub_total = self._catalog[item.product_name] * item.quantity
             discount = 0
 
-            offers_for_item = applicable_offers.get(item.product.name)
+            offers_for_item = applicable_offers.get(item.product_name)
             if offers_for_item:
                 # assume just one possible offer for product
                 offer_for_item = offers_for_item[0]
@@ -45,7 +46,7 @@ class BasketPriceCalculator:
     def _applicable_offers(self, basket_items: List[BasketItem]) -> Dict[str, List[Offer]]:
         offers = dict()
         for item in basket_items:
-            for offer in self._offers_provider.get_offer_for_product(item.product.name):
+            for offer in self._offers_provider.get_offer_for_product(item.product_name):
                 if self._is_offer_applicable(item, offer):
                     offers.setdefault(offer.product_name, []).append(offer)
         return offers
@@ -55,19 +56,18 @@ class BasketPriceCalculator:
 
     @staticmethod
     def _offer_about_product(item, offer):
-        return item.product.name == offer.product_name
+        return item.product_name == offer.product_name
 
     @staticmethod
     def _enough_item_in_basket(item, offer):
         return item.quantity // offer.number_of_products_required_to_bought > 0
 
-    @staticmethod
-    def _get_single_offer_discount(item, offer) -> float:
-        # get prices based on catalog, remove price from basket
+    def _get_single_offer_discount(self, item, offer) -> float:
+        product_price = self._catalog[item.product_name]
         if isinstance(offer, OfferFreeProducts):
-            return offer.number_of_free_products * item.product.price
+            return offer.number_of_free_products * product_price
         if isinstance(offer, OfferPercentageDiscount):
-            return offer.discount * item.product.price / 100
+            return offer.discount * product_price / 100
 
     @staticmethod
     def _calculate_final_price(items_price_results):

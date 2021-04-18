@@ -4,14 +4,8 @@ from typing import Dict, List
 
 
 @dataclass
-class Product:
-    name: str
-    price: float
-
-
-@dataclass
 class BasketItem:
-    product: Product
+    product_name: str
     quantity: int
 
 
