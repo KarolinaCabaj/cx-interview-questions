@@ -102,8 +102,7 @@ def test_calculate_price_when_no_offer_applies(basket_price_calculator, basket_m
 ])
 def test_calculate_price_when_single_offer_applies(basket_price_calculator, basket_mock,
                                                    offer_applicability_resolver_mock,
-                                                   basket_items,
-                                                   expected_result):
+                                                   basket_items, expected_result):
     basket_mock.get_items.return_value = basket_items
     offer_applicability_resolver_mock.get_offers_applicable_for_basket_items.return_value = {
         'shampoo': [
