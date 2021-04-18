@@ -1,13 +1,19 @@
 import itertools
 from typing import Dict, List, Tuple
 
-from models import BasketItem, Offer, OffersProvider
+from basket_pricer.models import BasketItem, Offer, OffersProvider
 
 
 # rename?
 class OfferApplicabilityResolver:
     def __init__(self, offers_provider: OffersProvider):
         self._offers_provider = offers_provider
+
+    @classmethod
+    def create(cls, offers: List[Offer]):
+        return cls(
+            offers_provider=OffersProvider(offers)
+        )
 
     def get_offers_applicable_for_basket_items(self, basket_items: List[BasketItem]) -> Dict[str, List[Offer]]:
         offers = dict()

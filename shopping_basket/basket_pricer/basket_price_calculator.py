@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Dict, List, Tuple
 
-from models import Basket, Offer, OfferFreeProducts, OfferPercentageDiscount
-from offer_applicability_resolver import OfferApplicabilityResolver
+from basket_pricer.models import Basket, Offer, OfferFreeProducts, OfferPercentageDiscount, OffersProvider
+from basket_pricer.offer_applicability_resolver import OfferApplicabilityResolver
 
 
 @dataclass
@@ -13,9 +13,9 @@ class PriceResult:
 
 
 class BasketPriceCalculator:
-    def __init__(self, catalog: Dict[str, float], offer_applicability_resolver: OfferApplicabilityResolver):
+    def __init__(self, catalog: Dict[str, float], offers: List[Offer]):
         self._catalog = catalog
-        self._offer_resolver = offer_applicability_resolver
+        self._offer_resolver = OfferApplicabilityResolver.create(offers)
 
     def calculate_price(self, basket: Basket) -> PriceResult:
         applicable_offers = self._offer_resolver.get_offers_applicable_for_basket_items(basket.get_items())

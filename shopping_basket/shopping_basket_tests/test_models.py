@@ -1,6 +1,6 @@
 import pytest
 
-from models import OfferFreeProducts, OfferPercentageDiscount, OffersProvider
+from basket_pricer.models import OfferFreeProducts, OfferPercentageDiscount, OffersProvider
 
 
 @pytest.fixture

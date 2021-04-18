@@ -11,7 +11,7 @@ class BasketItem:
 
 class Basket(ABC):
     def __init__(self, items: List[BasketItem] = None):
-        self.items = items or []
+        self._items = items or []
 
     def get_items(self) -> List[BasketItem]:
         raise NotImplementedError()

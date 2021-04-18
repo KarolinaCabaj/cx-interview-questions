@@ -1,10 +1,10 @@
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import pytest
 
-from basket_price_calculator import Basket, BasketPriceCalculator, PriceResult
-from models import BasketItem, OfferFreeProducts, OfferPercentageDiscount
-from offer_applicability_resolver import OfferApplicabilityResolver
+from basket_pricer.basket_price_calculator import Basket, BasketPriceCalculator, PriceResult
+from basket_pricer.models import BasketItem, OfferFreeProducts, OfferPercentageDiscount
+from basket_pricer.offer_applicability_resolver import OfferApplicabilityResolver
 
 
 @pytest.fixture
@@ -34,10 +34,12 @@ def offer_applicability_resolver_mock():
 
 @pytest.fixture
 def basket_price_calculator(catalog, offer_applicability_resolver_mock) -> BasketPriceCalculator:
-    return BasketPriceCalculator(
-        catalog=catalog,
-        offer_applicability_resolver=offer_applicability_resolver_mock
-    )
+    with patch('basket_pricer.offer_applicability_resolver.OfferApplicabilityResolver.create',
+               return_value=offer_applicability_resolver_mock):
+        yield BasketPriceCalculator(
+            catalog=catalog,
+            offers=[]
+        )
 
 
 def test_calculate_price_for_empty_basket(basket_price_calculator, basket_mock):

@@ -2,8 +2,8 @@ from unittest.mock import Mock
 
 import pytest
 
-from models import BasketItem, OfferFreeProducts, OfferPercentageDiscount, OffersProvider
-from offer_applicability_resolver import OfferApplicabilityResolver
+from basket_pricer.models import BasketItem, OfferFreeProducts, OfferPercentageDiscount, OffersProvider
+from basket_pricer.offer_applicability_resolver import OfferApplicabilityResolver
 
 
 @pytest.fixture
