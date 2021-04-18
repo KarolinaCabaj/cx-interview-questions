@@ -48,5 +48,5 @@ class OffersProvider:
     def get_offers(self) -> Dict[str, List[Offer]]:
         return self._offers
 
-    def get_offer_for_product(self, product_name: str) -> List[Offer]:
-        return self._offers[product_name]
+    def get_offers_for_product(self, product_name: str) -> List[Offer]:
+        return self._offers.get(product_name) or []

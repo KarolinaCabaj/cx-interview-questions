@@ -26,6 +26,11 @@ def test_get_offers(offer_provider, free_biscuits_offer, sardines_discount_offer
                       sardines_discount_offer.product_name: [sardines_discount_offer]}
 
 
-def test_get_offer_for_product(offer_provider, free_biscuits_offer):
-    result = offer_provider.get_offer_for_product(free_biscuits_offer.product_name)
+def test_get_offers_for_product(offer_provider, free_biscuits_offer):
+    result = offer_provider.get_offers_for_product(free_biscuits_offer.product_name)
     assert result == [free_biscuits_offer]
+
+
+def test_get_offers_for_product_when_there_is_no_offer(offer_provider):
+    result = offer_provider.get_offers_for_product('product_without_offer')
+    assert result == []

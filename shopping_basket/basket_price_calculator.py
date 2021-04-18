@@ -1,7 +1,8 @@
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import Dict
 
-from models import Basket, BasketItem, Offer, OfferFreeProducts, OfferPercentageDiscount, OffersProvider
+from models import Basket, OfferFreeProducts, OfferPercentageDiscount
+from offer_applicability_resolver import OfferApplicabilityResolver
 
 
 @dataclass
@@ -12,12 +13,12 @@ class PriceResult:
 
 
 class BasketPriceCalculator:
-    def __init__(self, catalog: Dict[str, float], offers_provider: OffersProvider):
+    def __init__(self, catalog: Dict[str, float], offer_applicability_resolver: OfferApplicabilityResolver):
         self._catalog = catalog
-        self._offers_provider = offers_provider
+        self._offer_applicability_resolver = offer_applicability_resolver
 
     def calculate_price(self, basket: Basket) -> PriceResult:
-        applicable_offers = self._applicable_offers(basket.get_items())
+        applicable_offers = self._offer_applicability_resolver.get_offers_applicable_for_basket_items(basket.get_items())
 
         items_price_results = []
         for item in basket.get_items():
@@ -42,25 +43,6 @@ class BasketPriceCalculator:
             items_price_results.append(item_price_result)
 
         return self._calculate_final_price(items_price_results)
-
-    def _applicable_offers(self, basket_items: List[BasketItem]) -> Dict[str, List[Offer]]:
-        offers = dict()
-        for item in basket_items:
-            for offer in self._offers_provider.get_offer_for_product(item.product_name):
-                if self._is_offer_applicable(item, offer):
-                    offers.setdefault(offer.product_name, []).append(offer)
-        return offers
-
-    def _is_offer_applicable(self, item: BasketItem, offer: Offer):
-        return self._offer_about_product(item, offer) and self._enough_item_in_basket(item, offer)
-
-    @staticmethod
-    def _offer_about_product(item, offer):
-        return item.product_name == offer.product_name
-
-    @staticmethod
-    def _enough_item_in_basket(item, offer):
-        return item.quantity // offer.number_of_products_required_to_bought > 0
 
     def _get_single_offer_discount(self, item, offer) -> float:
         product_price = self._catalog[item.product_name]
