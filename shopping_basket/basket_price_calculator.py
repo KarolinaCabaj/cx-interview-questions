@@ -50,9 +50,9 @@ class BasketPriceCalculator:
         sub_total = sum(r.sub_total for r in items_price_results)
         discount = sum(r.discount for r in items_price_results)
         return PriceResult(
-            sub_total=sub_total,
-            discount=discount,
-            total=sub_total - discount
+            sub_total=round(sub_total, 2),
+            discount=round(discount, 2),
+            total=round(sub_total - discount, 2)
         )
 
     def _calculate_discounts_for_offers_combination(self, offer_combinations: List[Tuple[Offer]]) -> List[float]:
